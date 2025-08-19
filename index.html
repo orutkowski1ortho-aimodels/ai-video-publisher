@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>AI Video Publisher – Login (Hot‑fix)</title>
+  <title>AI Video Publisher – Login (Hot‑fix v2)</title>
   <style>
     :root{--bg:#0f172a;--fg:#e5e7eb;--btn:#f8fafc;--border:#334155}
     html,body{height:100%}
@@ -44,7 +44,7 @@
     // 1) Wklej tu swój Sandbox Client Key (TikTok Developers → App → Sandbox → Client Key)
     const CLIENT_KEY = "sbaw8lk56uu0qhlnsh"; // <-- PODMIEŃ
     
-    // 2) Upewnij się, że ten adres jest dodany w App Settings jako Redirect URL
+    // 2) Upewnij się, że ten adres jest dodany w App Settings jako Redirect URL (dokładnie taki sam)
     const REDIRECT_URI = "https://orutkowski1ortho-aimodels.github.io/ai-video-publisher/";
     const REDIRECT_URI_ENC = encodeURIComponent(REDIRECT_URI);
 
@@ -54,8 +54,11 @@
     // 4) Prosty state (demo)
     const STATE = "xyz123";
 
+    // === WAŻNE: Prawidłowy endpoint OAuth v2 dla Web ===
+    const AUTH_BASE = "https://www.tiktok.com/v2/auth/authorize/"; // zgodnie z dokumentacją v2
+    
     // Budowa URL autoryzacji
-    const AUTH_URL = `https://open-api.tiktokglobalplatform.com/oauth/authorize/?client_key=${CLIENT_KEY}&response_type=code&scope=${encodeURIComponent(SCOPE)}&redirect_uri=${REDIRECT_URI_ENC}&state=${encodeURIComponent(STATE)}`;
+    const AUTH_URL = `${AUTH_BASE}?client_key=${CLIENT_KEY}&response_type=code&scope=${encodeURIComponent(SCOPE)}&redirect_uri=${REDIRECT_URI_ENC}&state=${encodeURIComponent(STATE)}`;
 
     // Podpięcie linku do przycisku
     document.getElementById("loginBtn").setAttribute("href", AUTH_URL);
