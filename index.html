@@ -3,31 +3,75 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>AI Video Publisher – Login</title>
+  <title>AI Video Publisher – Login (Hot‑fix)</title>
   <style>
-    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;margin:40px}
-    .btn{display:inline-block;padding:12px 18px;border-radius:8px;border:1px solid #222;text-decoration:none}
-    .note{margin-top:16px;color:#555}
+    :root{--bg:#0f172a;--fg:#e5e7eb;--btn:#f8fafc;--border:#334155}
+    html,body{height:100%}
+    body{margin:0;padding:32px;background:var(--bg);color:var(--fg);font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+    .wrap{max-width:720px;margin:0 auto}
+    h1{margin:0 0 12px;font-size:28px}
+    p{margin:8px 0 14px;line-height:1.45}
+    .btn{display:inline-block;padding:12px 18px;border-radius:10px;border:1px solid var(--border);
+         background:var(--btn);color:#0b1220;text-decoration:none;font-weight:600}
+    .note{margin-top:16px;color:#9ca3af;font-size:14px}
+    code{background:#0b1220;border:1px solid #1f2937;padding:2px 6px;border-radius:6px}
+    .card{margin-top:20px;padding:16px;border:1px solid var(--border);border-radius:12px}
   </style>
 </head>
 <body>
-  <h1>AI Video Publisher</h1>
-  <p>Kliknij, aby zalogować się TikTokiem (Sandbox, Login Kit + <code>user.info.basic</code>):</p>
+  <div class="wrap">
+    <h1>AI Video Publisher – TikTok Login (Sandbox)</h1>
+    <p>Kliknij przycisk poniżej, aby zalogować się TikTokiem (Login Kit + <code>user.info.basic</code>). Po akceptacji wrócisz na tę stronę z parametrem <code>?code=...</code>.</p>
 
-  <!-- PRZYCISK LOGOWANIA (OAuth authorize) -->
-  <a class="btn"
-     href="https://open-api.tiktokglobalplatform.com/oauth/authorize/
-?client_key=sbaw8lk56uu0qhlnsh
-&response_type=code
-&scope=user.info.basic
-&redirect_uri=https%3A%2F%2Forutkowski1ortho-aimodels.github.io%2Fai-video-publisher%2Fauth.html
-&state=xyz123">
-    Sign in with TikTok
-  </a>
+    <!-- WSTAW SWÓJ SANDBOX CLIENT KEY PONIŻEJ -->
+    <a class="btn" id="loginBtn" href="#">
+      Sign in with TikTok
+    </a>
 
-  <p class="note">
-    Uwaga: <code>redirect_uri</code> musi być URL‑encoded i dokładnie taki sam jak w ustawieniach aplikacji.<br>
-    Ten demo‑przepływ pokaże powrót na stronę <code>auth.html</code> z kodem <code>?code=...</code>.
-  </p>
+    <div class="note">
+      <p><strong>Uwaga:</strong> Ten hot‑fix używa <code>redirect_uri</code> wskazującego na <em>index.html</em>.
+      Kod autoryzacyjny zostanie pokazany poniżej po powrocie z TikToka.</p>
+    </div>
+
+    <div class="card" id="oauthBox">
+      <h3>OAuth return</h3>
+      <div id="out"><em>Po zalogowaniu zobaczysz tu <code>code</code> i <code>state</code>.</em></div>
+    </div>
+  </div>
+
+  <script>
+    // === USTAWIENIA ===
+    // 1) Wklej tu swój Sandbox Client Key (TikTok Developers → App → Sandbox → Client Key)
+    const CLIENT_KEY = "sbaw8lk56uu0qhlnsh"; // <-- PODMIEŃ
+    
+    // 2) Upewnij się, że ten adres jest dodany w App Settings jako Redirect URL
+    const REDIRECT_URI = "https://orutkowski1ortho-aimodels.github.io/ai-video-publisher/";
+    const REDIRECT_URI_ENC = encodeURIComponent(REDIRECT_URI);
+
+    // 3) Minimalny scope dla Login Kit
+    const SCOPE = "user.info.basic";
+
+    // 4) Prosty state (demo)
+    const STATE = "xyz123";
+
+    // Budowa URL autoryzacji
+    const AUTH_URL = `https://open-api.tiktokglobalplatform.com/oauth/authorize/?client_key=${CLIENT_KEY}&response_type=code&scope=${encodeURIComponent(SCOPE)}&redirect_uri=${REDIRECT_URI_ENC}&state=${encodeURIComponent(STATE)}`;
+
+    // Podpięcie linku do przycisku
+    document.getElementById("loginBtn").setAttribute("href", AUTH_URL);
+
+    // Parsowanie parametrów po powrocie
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get("code");
+    const state = params.get("state");
+    const error = params.get("error");
+    const out = document.getElementById("out");
+
+    if (error) {
+      out.innerHTML = `❌ Error: <code>${error}</code>`;
+    } else if (code) {
+      out.innerHTML = `✅ Received code: <code>${code}</code><br/>State: <code>${state || "(none)"} </code>`;
+    }
+  </script>
 </body>
 </html>
